@@ -4,10 +4,6 @@
   <meta charset="UTF-8" />
   <title>Retro Rewind - Neon Gobbler</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.4/lib/p5.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/planck@latest/dist/planck.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/p5play@3.26.5/p5play.min.js"></script>
-
   <style>
     body {
       margin: 0;
@@ -29,6 +25,22 @@
 </head>
 
 <body>
-  <script src="sketch.js"></script>
+  <main></main>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "q5": "https://q5js.org/q5.js",
+        "q5play": "https://q5play.org/q5play.js",
+        "box2d3-wasm": "https://q5play.org/Box2D.deluxe.mjs"
+      }
+    }
+  </script>
+
+  <script type="module">
+    import "q5";
+    import "q5play";
+    import "./sketch.js";
+  </script>
 </body>
 </html>
