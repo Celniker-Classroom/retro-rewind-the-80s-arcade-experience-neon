@@ -29,6 +29,7 @@ function draw() {
   background(5, 0, 20);
 
   if (state === "title") titleScreen();
+  else if (state === "about") aboutScreen();
   else if (state === "play") playGame();
   else if (state === "gameover") gameOverScreen();
   else if (state === "win") winScreen();
@@ -53,6 +54,62 @@ function titleScreen() {
   fill(255, 255, 0);
   textSize(20);
   text("PRESS SPACE TO START", width / 2, 385);
+
+  if (kb.presses("space")) {
+    state = "about";
+  }
+}
+
+function aboutScreen() {
+  drawGrid();
+
+  // Title
+  fill(0, 255, 255);
+  textAlign(CENTER);
+  textSize(28);
+  text("ABOUT NEON GOBBLER", width / 2, 60);
+
+  // Divider line
+  stroke(0, 255, 255);
+  strokeWeight(1);
+  line(40, 75, width - 40, 75);
+  noStroke();
+
+  // Inspiration paragraph — wrapped into lines that fit the canvas
+  fill(200, 200, 255);
+  textSize(13);
+  textAlign(LEFT);
+
+  let lines = [
+    "Neon Gobbler was directly inspired by the 1980 arcade",
+    "classic Pac-Man, developed by Namco and widely regarded",
+    "as one of the most iconic games of the Golden Age of",
+    "arcades. Like Pac-Man, the core loop revolves around",
+    "navigating a maze, collecting pellets, and avoiding",
+    "ghost-like enemies that chase the player. I adapted this",
+    "formula by replacing traditional pixel sprites with glowing",
+    "blob-shaped characters rendered in neon colors to give the",
+    "game a distinct synthwave aesthetic inspired by 80s visual",
+    "culture. Rather than the standard power pellet mechanic",
+    "that immediately empowers the player, I introduced a",
+    "30-second countdown timer that forces ghosts to reveal",
+    "themselves and become vulnerable — adding suspense and",
+    "strategic patience that rewards survival over aggression.",
+    "The result honors the addictive arcade spirit while putting",
+    "a fresh twist on one of its most beloved mechanics."
+  ];
+
+  let startY = 105;
+  let lineH = 22;
+  for (let i = 0; i < lines.length; i++) {
+    text(lines[i], 45, startY + i * lineH);
+  }
+
+  // Prompt
+  fill(255, 255, 0);
+  textAlign(CENTER);
+  textSize(18);
+  text("PRESS SPACE TO PLAY", width / 2, 460);
 
   if (kb.presses("space")) {
     startGame();
@@ -80,12 +137,15 @@ function startGame() {
   state = "play";
 }
 
+let playerSpawnX = 48;
+let playerSpawnY = 48;
+
 function makeMaze() {
   let tile = 32;
 
   let maze = [
     "11111111111111111111",
-    "1P.....1......1....O1",
+    "1P.....1......1....O",
     "1.111..1.111..1.1111",
     "1..................1",
     "1.111.11111111.111.1",
@@ -128,6 +188,8 @@ function makeMaze() {
       if (spot === "P") {
         player = new Sprite(x, y, 28, 28, "dynamic");
         player.rotationLock = true;
+        playerSpawnX = x;
+        playerSpawnY = y;
         player.draw = function () {
           drawGreenGlob(0, 0, 32);
         };
@@ -174,7 +236,7 @@ function playGame() {
     }
   }
 
-  if (pellets.length === 0 && powerUps.length === 0 && enemies.length === 0) {
+  if (pellets.length === 0 && powerUps.length === 0) {
     state = "win";
   }
 }
@@ -242,8 +304,8 @@ function touchGhost(playerSprite, enemySprite) {
   } else {
     lives--;
 
-    player.x = 48;
-    player.y = 48;
+    player.x = playerSpawnX;
+    player.y = playerSpawnY;
     player.vel.x = 0;
     player.vel.y = 0;
 
@@ -355,7 +417,7 @@ function drawPurpleGlob(x, y, s, edible) {
 }
 
 function gameOverScreen() {
-  clearGame();
+  if (player) clearGame();
   drawGrid();
 
   fill(255, 0, 80);
@@ -377,7 +439,7 @@ function gameOverScreen() {
 }
 
 function winScreen() {
-  clearGame();
+  if (player) clearGame();
   drawGrid();
 
   fill(0, 255, 120);

@@ -1,0 +1,14 @@
+<!doctype html>
+<html>
+  <body>
+    <script type="module">
+      import './node_modules/q5/q5.js';
+      import './node_modules/q5play/q5play.js';
+      console.log('loaded local imports', typeof window.Q5, typeof window.p5, typeof window.Canvas);
+      new Canvas(640, 480);
+      console.log('canvas created', !!document.querySelector('canvas'));
+      background(0, 0, 0);
+      text('hello', 100, 100);
+    </script>
+  </body>
+</html>

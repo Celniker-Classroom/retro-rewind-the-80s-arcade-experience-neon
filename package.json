@@ -13,5 +13,8 @@
 		"dist": "rsync -av --exclude='.git' . ~/dev/ext/q5play-vscode/q5play-template",
 		"version": "git add -A",
 		"postversion": "git push"
+	},
+	"devDependencies": {
+		"playwright": "^1.60.0"
 	}
 }

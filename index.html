@@ -3,29 +3,253 @@
 <head>
   <meta charset="UTF-8" />
   <title>Retro Rewind - Neon Gobbler</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
 
   <style>
+    :root {
+      --cyan:    #00ffff;
+      --magenta: #ff00ff;
+      --yellow:  #ffff00;
+      --green:   #00ff78;
+      --purple:  #8c1ef0;
+      --bg:      #050014;
+      --grid:    rgba(80, 0, 130, 0.45);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
       margin: 0;
-      background: #050014;
+      background: var(--bg);
       color: white;
-      font-family: monospace;
+      font-family: 'VT323', monospace;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
+      gap: 32px;
+      padding: 24px;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 3px,
+        rgba(0,0,0,0.15) 3px,
+        rgba(0,0,0,0.15) 4px
+      );
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+      background-size: 30px 30px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .game-wrap {
+      position: relative;
+      z-index: 1;
+      flex-shrink: 0;
     }
 
     canvas {
-      border: 6px solid cyan;
-      box-shadow: 0 0 25px magenta;
+      border: 6px solid var(--cyan);
+      box-shadow: 0 0 25px var(--magenta), 0 0 50px rgba(0,255,255,0.15);
       image-rendering: pixelated;
+      display: block;
+    }
+
+    .about-panel {
+      position: relative;
+      z-index: 1;
+      width: 300px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      animation: fadeUp 0.7s ease 0.2s both;
+    }
+
+    .panel-heading {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.65rem;
+      color: var(--cyan);
+      text-shadow: 0 0 10px var(--cyan);
+      letter-spacing: 0.15em;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(0,255,255,0.3);
+    }
+
+    .panel-card {
+      border: 1px solid rgba(0,255,255,0.35);
+      padding: 18px 16px;
+      position: relative;
+      background: rgba(0,255,255,0.02);
+    }
+
+    .panel-card::before {
+      content: '▮';
+      position: absolute;
+      top: -9px; left: -1px;
+      font-size: 0.8rem;
+      color: var(--magenta);
+      text-shadow: 0 0 6px var(--magenta);
+    }
+
+    .card-tag {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.42rem;
+      letter-spacing: 0.2em;
+      color: var(--magenta);
+      text-shadow: 0 0 5px var(--magenta);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-tag::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, var(--magenta), transparent);
+    }
+
+    .about-text {
+      font-family: 'VT323', monospace;
+      font-size: 1.1rem;
+      line-height: 1.65;
+      color: #ccc4ff;
+    }
+
+    .about-text .hl-yellow { color: var(--yellow); text-shadow: 0 0 6px var(--yellow); }
+    .about-text .hl-cyan   { color: var(--cyan);   text-shadow: 0 0 6px var(--cyan); }
+    .about-text .hl-green  { color: var(--green);  text-shadow: 0 0 6px var(--green); }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .stat {
+      border: 1px solid rgba(0,255,255,0.25);
+      padding: 10px 6px;
+      text-align: center;
+      transition: border-color 0.2s;
+    }
+    .stat:hover { border-color: var(--cyan); box-shadow: 0 0 8px rgba(0,255,255,0.2); }
+
+    .stat-value {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.55rem;
+      color: var(--yellow);
+      text-shadow: 0 0 6px var(--yellow);
+      display: block;
+      margin-bottom: 5px;
+    }
+    .stat-label {
+      font-family: 'VT323', monospace;
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.45);
+      letter-spacing: 0.05em;
+    }
+
+    .controls-grid {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 6px 12px;
+      align-items: center;
+    }
+    .key {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 0.42rem;
+      background: rgba(0,255,255,0.1);
+      border: 1px solid rgba(0,255,255,0.4);
+      color: var(--cyan);
+      padding: 4px 7px;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .key-desc {
+      font-family: 'VT323', monospace;
+      font-size: 1rem;
+      color: rgba(255,255,255,0.6);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 
 <body>
-  <main></main>
+
+  <div class="game-wrap">
+    <main></main>
+  </div>
+
+  <aside class="about-panel">
+
+    <p class="panel-heading">NEON GOBBLER</p>
+
+    <div class="panel-card">
+      <p class="card-tag">INSPIRATION</p>
+      <p class="about-text">
+        <span class="hl-green">Neon Gobbler</span> was directly inspired by the
+        <span class="hl-yellow">1980 arcade classic Pac-Man</span>, developed by Namco
+        and widely regarded as one of the most iconic games of the Golden Age of arcades.
+        Like Pac-Man, the core loop revolves around navigating a maze, collecting pellets,
+        and avoiding ghost-like enemies that chase the player. We adapted this formula by
+        replacing traditional pixel sprites with glowing,
+        <span class="hl-cyan">blob-shaped characters rendered in neon colors</span>
+        to give the game a distinct synthwave aesthetic inspired by 80s visual culture.
+        Rather than the standard power pellet mechanic that immediately empowers the player,
+        we introduced a <span class="hl-yellow">30-second countdown timer</span> that forces
+        ghosts to reveal themselves and become vulnerable — adding suspense and strategic
+        patience that rewards survival over aggression. The result honors the addictive
+        <span class="hl-cyan">"just one more try"</span> spirit of the arcade era while
+        putting a fresh twist on one of its most beloved mechanics.
+      </p>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <span class="stat-value">1980</span>
+        <span class="stat-label">INSPIRED BY</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value">PAC-MAN</span>
+        <span class="stat-label">SOURCE GAME</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value">NAMCO</span>
+        <span class="stat-label">ORIGINAL DEV</span>
+      </div>
+    </div>
+
+    <div class="panel-card">
+      <p class="card-tag">CONTROLS</p>
+      <div class="controls-grid">
+        <span class="key">WASD / ↑↓←→</span><span class="key-desc">Move</span>
+        <span class="key">SPACE</span><span class="key-desc">Start / Confirm</span>
+      </div>
+    </div>
+
+  </aside>
 
   <script type="importmap">
     {
@@ -42,5 +266,6 @@
     import "q5play";
     import "./sketch.js";
   </script>
+
 </body>
 </html>
